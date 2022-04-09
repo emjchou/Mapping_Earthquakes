@@ -1,24 +1,38 @@
 // add console.log to check if code is working
 console.log("working");
 
-// get data from cities.js 
-let cityData = cities;
-
 // create map object w a center and zoom level
-let map = L.map("mapid").setView([40.7, -94.5], 4);
+let map = L.map("mapid").setView([37.5, -122.5], 10);
 
-// Loop thru the cities array and create one marker for each city
-cityData.forEach(function(city) {
-    console.log(city);
-    L.circleMarker(city.location, {
-        radius: city.population/100000,
-        color: "orange",
-        fillColor: "orange",
-        fillOpacity: 0.5
-    }).
-    bindPopup("<h2>" + city.city + ", " + city.state + "</h2> <hr> <h3>Population " + city.population.toLocaleString() + "</h3>")
-    .addTo(map);
-});
+// Add GeoJSON data.
+let sanFranAirport =
+{"type":"FeatureCollection","features":[{
+    "type":"Feature",
+    "properties":{
+        "id":"3469",
+        "name":"San Francisco International Airport",
+        "city":"San Francisco",
+        "country":"United States",
+        "faa":"SFO",
+        "icao":"KSFO",
+        "alt":"13",
+        "tz-offset":"-8",
+        "dst":"A",
+        "tz":"America/Los_Angeles"},
+        "geometry":{
+            "type":"Point",
+            "coordinates":[-122.375,37.61899948120117]}}
+]};
+
+// Grab GeoJSON data, add to map
+L.geoJSON(sanFranAirport, {
+    //turn each feature into a marker on the map
+    onEachFeature: function(feature, layer) {
+        console.log(layer);
+        layer.bindPopup("<h1>Airport code: " + feature.properties.faa + "</h1>"+
+        "<hr><h4>Airport name: " + feature.properties.name + "</h4>");
+        }
+}).addTo(map)
 
 // We create the tile layer that will be the background of our map.
 let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -28,6 +42,4 @@ attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap
 });
 
 // Then we add our 'graymap' tile layer to the map.
-streets.addTo(map);
-// add our "graymap" tile layer to map
 streets.addTo(map);
